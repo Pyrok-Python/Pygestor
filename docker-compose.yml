@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  pygestor:
+    build: .
+    container_name: pygestor_app
+    restart: unless-stopped
+    ports:
+      - "8090:5000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      # Apuntar la base de datos a la carpeta de volumen persistente
+      - DATABASE_URL=sqlite:////app/data/pygestor.db
+    volumes:
+      # Persistencia de datos: guarda la base de datos en la máquina host
+      - ./data:/app/data

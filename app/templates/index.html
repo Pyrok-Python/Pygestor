@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="welcome-banner">
+    <h2>{{ _('Welcome, %(username)s!', username=current_user.username) }}</h2>
+</div>
+
+<section class="add-task-section glass-card">
+    <h2>{{ _('New Task') }}</h2>
+    <form action="{{ url_for('main.add_task') }}" method="POST" class="task-form">
+        <input type="text" name="title" placeholder="{{ _('What needs to be done?') }}" required class="input-field">
+        <input type="text" name="description" placeholder="{{ _('Short description (optional)') }}" class="input-field">
+        <button type="submit" class="btn-primary">{{ _('Add Task') }}</button>
+    </form>
+</section>
+
+<section class="kanban-board">
+    <!-- Pendientes -->
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>{{ _('Pending') }}</h3>
+            <span class="badge">{{ pending|length }}</span>
+        </div>
+        <div class="task-list">
+            {% for task in pending %}
+            <div class="task-card glass-card">
+                <h4>{{ task.title }}</h4>
+                {% if task.description %}
+                    <p>{{ task.description }}</p>
+                {% endif %}
+                <div class="task-actions">
+                    <form action="{{ url_for('main.update_task', id=task.id) }}" method="POST">
+                        <input type="hidden" name="status" value="in_progress">
+                        <button type="submit" class="btn-icon btn-start" title="{{ _('Start') }}">▶</button>
+                    </form>
+                    <form action="{{ url_for('main.delete_task', id=task.id) }}" method="POST">
+                        <button type="submit" class="btn-icon btn-delete" title="{{ _('Delete') }}">✖</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="empty-state">{{ _('No pending tasks.') }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- En Progreso -->
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>{{ _('In Progress') }}</h3>
+            <span class="badge in-progress-badge">{{ in_progress|length }}</span>
+        </div>
+        <div class="task-list">
+            {% for task in in_progress %}
+            <div class="task-card glass-card border-progress">
+                <h4>{{ task.title }}</h4>
+                {% if task.description %}
+                    <p>{{ task.description }}</p>
+                {% endif %}
+                <div class="task-actions">
+                    <form action="{{ url_for('main.update_task', id=task.id) }}" method="POST">
+                        <input type="hidden" name="status" value="completed">
+                        <button type="submit" class="btn-icon btn-complete" title="{{ _('Complete') }}">✔</button>
+                    </form>
+                    <form action="{{ url_for('main.update_task', id=task.id) }}" method="POST">
+                        <input type="hidden" name="status" value="pending">
+                        <button type="submit" class="btn-icon btn-back" title="{{ _('Move back') }}">◀</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="empty-state">{{ _('Nothing in progress.') }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Completadas -->
+    <div class="kanban-column">
+        <div class="column-header">
+            <h3>{{ _('Completed') }}</h3>
+            <span class="badge completed-badge">{{ completed|length }}</span>
+        </div>
+        <div class="task-list">
+            {% for task in completed %}
+            <div class="task-card glass-card border-completed">
+                <h4 class="text-strikethrough">{{ task.title }}</h4>
+                <div class="task-actions">
+                    <form action="{{ url_for('main.update_task', id=task.id) }}" method="POST">
+                        <input type="hidden" name="status" value="pending">
+                        <button type="submit" class="btn-icon btn-back" title="{{ _('Reopen') }}">↺</button>
+                    </form>
+                    <form action="{{ url_for('main.delete_task', id=task.id) }}" method="POST">
+                        <button type="submit" class="btn-icon btn-delete" title="{{ _('Delete') }}">✖</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <p class="empty-state">{{ _('None completed yet.') }}</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

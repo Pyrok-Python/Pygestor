@@ -70,10 +70,19 @@ def add_task():
 @login_required
 def update_task(id):
     task = Task.query.filter_by(id=id, user_id=current_user.id).first_or_404()
-    new_status = request.form.get('status')
+    
+    # Soporta tanto peticiones tradicionales como peticiones AJAX JSON (Drag & Drop)
+    if request.is_json:
+        new_status = request.json.get('status')
+    else:
+        new_status = request.form.get('status')
+        
     if new_status in ['pending', 'in_progress', 'completed']:
         task.status = new_status
         db.session.commit()
+        if request.is_json:
+            return {'success': True}
+            
     return redirect(url_for('main.index'))
 
 @bp.route('/delete/<int:id>', methods=['POST'])

@@ -3,6 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_babel import Babel
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -17,7 +20,7 @@ def create_app():
     app = Flask(__name__)
     
     # Configuraciones
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'portfolio_secret_key_123')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_fallback_key')
     basedir = os.path.abspath(os.path.dirname(__file__))
     
     # Soportar base de datos configurada por entorno (ideal para Docker/Prod)
